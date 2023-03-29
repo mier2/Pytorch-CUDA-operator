@@ -54,32 +54,9 @@ void spmm_cuda_no_edge_value(int nrowA, int ncolB, int *rowptr, int *colind,
 
 // individual algorithms
 // -- non-transpose --
-void csrspmm_non_transpose_parreduce_rowbalance(const SpMatCsrDescr_t spmatA,
+void csrspmm_non_transpose_parreduce_rowbalance_cuda(const SpMatCsrDescr_t spmatA,
                                                 const float *B, const int N,
                                                 float *C);
-void csrspmm_non_transpose_parreduce_nnzbalance(const SpMatCsrDescr_t spmatA,
-                                                const float *B, const int N,
-                                                float *C);
-void csrspmm_non_transpose_seqreduce_rowbalance(const SpMatCsrDescr_t spmatA,
-                                                const float *B, const int N,
-                                                float *C);
-void csrspmm_non_transpose_seqreduce_nnzbalance(const SpMatCsrDescr_t spmatA,
-                                                const float *B, const int N,
-                                                float *C);
-// -- parreduce --
-void csrspmm_parreduce_rowbalance(const SpMatCsrDescr_t spmatA, const float *B,
-                                  const int N, float *C);
-void csrspmm_parreduce_nnzbalance(const SpMatCsrDescr_t spmatA, const float *B,
-                                  const int N, float *C);
-// -- seqreduce --
-void csrspmm_seqreduce_rowbalance(const SpMatCsrDescr_t spmatA, const float *B,
-                                  const int N, float *C);
-void csrspmm_seqreduce_nnzbalance(const SpMatCsrDescr_t spmatA, const float *B,
-                                  const int N, float *C);
-// -- row-caching --
-void csrspmm_rowcaching_rowbalance(const SpMatCsrDescr_t spmatA, const float *B,
-                                   const int N, float *C);
-void csrspmm_rowcaching_nnzbalance(const SpMatCsrDescr_t spmatA, const float *B,
-                                   const int N, float *C);
+
 }
 #endif // GESPMM_H

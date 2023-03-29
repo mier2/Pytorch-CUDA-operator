@@ -93,54 +93,54 @@ __device__ __forceinline__ index_t findRow(const index_t *S_csrRowPtr,
 // Use example:
 //    calc_vari<float><<<((L + 511) / 512), 512>>>(vari, indptr, nrow, nnz)
 
-template <typename FTYPE>
-__global__ void
-calc_vari(FTYPE *vari,       // calculation result goes to this address
-          const int *indptr, // the csr indptr array
-          const int nrow,    // length of the array
-          const int nnz      // total number of non-zeros
-) {
-  __shared__ FTYPE shared[32];
-  FTYPE avg = ((FTYPE)nnz) / nrow;
-  int tid = blockIdx.x * blockDim.x + threadIdx.x;
-  int x;
-  if (tid < nrow) {
-    x = indptr[tid + 1] - indptr[tid];
-  }
+// template <typename FTYPE>
+// __global__ void
+// calc_vari(FTYPE *vari,       // calculation result goes to this address
+//           const int *indptr, // the csr indptr array
+//           const int nrow,    // length of the array
+//           const int nnz      // total number of non-zeros
+// ) {
+//   __shared__ FTYPE shared[32];
+//   FTYPE avg = ((FTYPE)nnz) / nrow;
+//   int tid = blockIdx.x * blockDim.x + threadIdx.x;
+//   int x;
+//   if (tid < nrow) {
+//     x = indptr[tid + 1] - indptr[tid];
+//   }
 
-  FTYPE r = x - avg;
-  r = r * r;
-  if (tid >= nrow) {
-    r = 0;
-  }
+//   FTYPE r = x - avg;
+//   r = r * r;
+//   if (tid >= nrow) {
+//     r = 0;
+//   }
 
-  r += __shfl_down_sync(FULLMASK, r, 16);
-  r += __shfl_down_sync(FULLMASK, r, 8);
-  r += __shfl_down_sync(FULLMASK, r, 4);
-  r += __shfl_down_sync(FULLMASK, r, 2);
-  r += __shfl_down_sync(FULLMASK, r, 1);
+//   r += __shfl_down_sync(FULLMASK, r, 16);
+//   r += __shfl_down_sync(FULLMASK, r, 8);
+//   r += __shfl_down_sync(FULLMASK, r, 4);
+//   r += __shfl_down_sync(FULLMASK, r, 2);
+//   r += __shfl_down_sync(FULLMASK, r, 1);
 
-  if ((threadIdx.x & 31) == 0) {
-    shared[(threadIdx.x >> 5)] = r;
-  }
-  __syncthreads();
+//   if ((threadIdx.x & 31) == 0) {
+//     shared[(threadIdx.x >> 5)] = r;
+//   }
+//   __syncthreads();
 
-  if ((threadIdx.x >> 5) == 0) {
-    r = shared[threadIdx.x & 31];
-    if ((threadIdx.x << 5) >= blockDim.x)
-      r = 0;
+//   if ((threadIdx.x >> 5) == 0) {
+//     r = shared[threadIdx.x & 31];
+//     if ((threadIdx.x << 5) >= blockDim.x)
+//       r = 0;
 
-    r += __shfl_down_sync(FULLMASK, r, 16);
-    r += __shfl_down_sync(FULLMASK, r, 8);
-    r += __shfl_down_sync(FULLMASK, r, 4);
-    r += __shfl_down_sync(FULLMASK, r, 2);
-    r += __shfl_down_sync(FULLMASK, r, 1);
+//     r += __shfl_down_sync(FULLMASK, r, 16);
+//     r += __shfl_down_sync(FULLMASK, r, 8);
+//     r += __shfl_down_sync(FULLMASK, r, 4);
+//     r += __shfl_down_sync(FULLMASK, r, 2);
+//     r += __shfl_down_sync(FULLMASK, r, 1);
 
-    if (threadIdx.x == 0) {
-      atomicAdd(vari, (r / nrow));
-    }
-  }
-}
+//     if (threadIdx.x == 0) {
+//       atomicAdd(vari, (r / nrow));
+//     }
+//   }
+// }
 
 template <typename T>
 __device__ __forceinline__ void ldg_float(float *r, const float *a) {

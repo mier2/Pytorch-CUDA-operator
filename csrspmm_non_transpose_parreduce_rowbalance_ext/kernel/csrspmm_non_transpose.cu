@@ -1,8 +1,8 @@
 // file: csrspmm_non_transpose.cuh
 //      Implementation of spmm with column-major dense matrix
 
-#include "cuda_util.cuh"
-#include "gespmm.h"
+#include "../include/cuda_util.cuh"
+#include "../include/gespmm.h"
 
 
 template <int CoarsenFactor>

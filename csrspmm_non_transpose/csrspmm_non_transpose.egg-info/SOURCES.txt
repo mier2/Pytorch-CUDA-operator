@@ -1,7 +1,0 @@
-csrspmm_non_transpose.cu
-non_transpose_cuda.cpp
-setup.py
-csrspmm_non_transpose.egg-info/PKG-INFO
-csrspmm_non_transpose.egg-info/SOURCES.txt
-csrspmm_non_transpose.egg-info/dependency_links.txt
-csrspmm_non_transpose.egg-info/top_level.txt
