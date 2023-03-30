@@ -22,7 +22,7 @@ class TestCSRSPMM(unittest.TestCase):
         # void csrspmm_non_transpose_parreduce_rowbalance(int nrow, int ncol, int nnz,
         #                                         torch::Tensor &indptr, torch::Tensor &indices, torch::Tensor &data,
         #                                         const torch::Tensor &B, const int N, torch::Tensor &C)
-        csrspmm.csrspmm_non_transpose_parreduce_rowbalance(3, 2, 5, csr_row_ptrs, csr_col_indices, csr_values, B,2, C)
+        csrspmm.csrspmm_non_transpose_parreduce_rowbalance(3, 3, 5, csr_row_ptrs, csr_col_indices, csr_values, B,2, C)
         # Compute the expected result
         C_expected = torch.matmul(A_dense, B)
         print("C_expected:")
