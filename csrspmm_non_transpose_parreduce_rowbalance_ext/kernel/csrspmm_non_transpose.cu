@@ -5,6 +5,7 @@
 #include "../include/gespmm.h"
 
 
+
 template <int CoarsenFactor>
 __global__ void csrspmm_non_transpose_parreduce_rowbalance_kernel(
     const int M, const int N, const int K, const int csr_indptr[],
