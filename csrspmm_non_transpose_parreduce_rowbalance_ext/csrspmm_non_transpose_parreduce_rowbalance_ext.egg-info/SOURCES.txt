@@ -1,7 +1,0 @@
-csrspmm_non_transpose_parreduce_rowbalance.cpp
-setup.py
-csrspmm_non_transpose_parreduce_rowbalance_ext.egg-info/PKG-INFO
-csrspmm_non_transpose_parreduce_rowbalance_ext.egg-info/SOURCES.txt
-csrspmm_non_transpose_parreduce_rowbalance_ext.egg-info/dependency_links.txt
-csrspmm_non_transpose_parreduce_rowbalance_ext.egg-info/top_level.txt
-kernel/csrspmm_non_transpose.cu
