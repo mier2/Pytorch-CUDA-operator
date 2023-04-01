@@ -1,10 +1,10 @@
 import torch
-import numpy
 import unittest
 import scipy
 import random
 from pathlib import Path
 import gespmm_ext as csrspmm
+from data_loader import DataLoader
 
 def fill_random(arr, size):
         for i in range(size):
@@ -84,16 +84,11 @@ class TestSparseMM(unittest.TestCase):
     
     def test_mid(self):
         filepath = '../matrices/1.mtx'
-        file = Path(filepath)
-        if file.is_file() == False:
-            print("Unable to locate the file")
-        else:
-            A_sparse = scipy.io.mmread(filepath)
-            A_csr = scipy.sparse.csr_matrix(A_sparse)
-            nrow, ncol = A_csr.shape
-            csr_indices_buffer = A_csr.indices
-            csr_indptr_buffer = A_csr.indptr
-            nnz = A_csr.nnz
-            print("Finish reading matrix "+ str(nrow) +" rows, " + str(ncol) +" columns, "+ str(nnz)+" nnzs")
+        data_loader = DataLoader(filepath)
+        A_sparse = data_loader.read_mtx()
+        A_csr = scipy.sparse.csr_matrix(A_sparse)
+        print("Finish reading matrix "+ str(A_csr.shape[0]) +" rows, " + str(A_csr.shape[1]) +" columns, "+ str(A_csr.nnz)+" nnzs")
+
+
 if __name__ == '__main__':
     unittest.main()
