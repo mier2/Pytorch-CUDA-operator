@@ -2,6 +2,7 @@ import sys
 import numpy as np
 import torch
 import scipy
+from pathlib import Path
 import gespmm_ext as csrspmm
 
 
@@ -12,8 +13,10 @@ class SpmmUtil:
     def check_result(self, C_ref, C):
         if torch.all(torch.abs(C-C_ref) > 1e-2* torch.abs(C_ref)):
                 print("Wrong answer")
+                return False
         else:
                 print("Passed")
+                return True
 
     #algo selector
     def gespmmAlgSel(self,dense_ncol, transpose_BC):
@@ -26,7 +29,7 @@ class SpmmUtil:
                         return "GESPMM_ALG_PARREDUCE_ROWBALANCE_NON_TRANSPOSE"
     
     #algo dispatcher
-    def gespmmCsrSpMM(self, M, K, nnz, indptr_tensor, indices_tensor, data_tensor, B, N, C, transpose_BC, alg = "GESPMM_ALG_DEFAULT"):
+    def gespmmCsrSpMM(self, M, K, nnz, indptr_tensor, indices_tensor, data_tensor, B, N, C, transpose_BC, alg):
         if alg == "GESPMM_ALG_DEFAULT":
             alg = self.gespmmAlgSel(N, transpose_BC)
         
@@ -63,12 +66,39 @@ class SpmmUtil:
                         print("Unknown algorithm")
                       
                             
-                            
+class DataLoader:
+    def __init__(self, file_path):
+        self.file_path = file_path
+    
+    def read_mtx(self):
+        file = Path(self.file_path)
+        if file.is_file() and file.suffix=='.mtx':
+            return scipy.io.mmread(self.file_path)
+        else:
+            print("Can't locate the file")
+            if not file.endswith('.mtx'):
+                print("Data format is not .mtx")                            
 
                         
-
+class GpuTimer:
+    def __init__(self):
+        self.start_event = torch.cuda.Event(enable_timing=True)
+        self.stop_event = torch.cuda.Event(enable_timing=True)
+    
+    def start(self):
+        self.start_event.record()
+    
+    def stop(self):
+        self.stop_event.record()
+        torch.cuda.synchronize()
+    
+    def elapsed_time(self):
+        return self.start_event.elapsed_time(self.stop_event)
+    
+    
+    
                           
-            
+        
             
         
             

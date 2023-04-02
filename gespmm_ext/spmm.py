@@ -2,9 +2,8 @@ import sys
 import numpy as np
 import torch
 import scipy
-import gespmm_ext as csrspmm
-from data_loader import DataLoader
-from spmm_util import SpmmUtil
+import time
+from spmm_util import SpmmUtil, DataLoader, GpuTimer
 
 
 def main(argv):
@@ -37,10 +36,31 @@ def main(argv):
         indices_tensor = torch.tensor(A_csr.indices, dtype=torch.int32).cuda()
         data_tensor = torch.tensor(A_csr.data, dtype=torch.float32).cuda()
         
+        #select the algorithm and check the result
+        alg = "GESPMM_ALG_DEFAULT"
         spmm_util = SpmmUtil()
-        #csrspmm.csrspmm_seqreduce_rowbalance(M, K, A_csr.nnz, indptr_tensor, indices_tensor, data_tensor, B, N, C)
-        spmm_util.gespmmCsrSpMM(M, K, A_csr.nnz, indptr_tensor, indices_tensor, data_tensor, B, N,C, True)
-        spmm_util.check_result(C_ref, C)
+        spmm_util.gespmmCsrSpMM(M, K, A_csr.nnz, indptr_tensor, indices_tensor, data_tensor, B, N,C, True, alg)
+        correct = spmm_util.check_result(C_ref, C)
+
+        if correct:
+                gpu_timer = GpuTimer()
+                warmup_iter = 10
+                repeat_iter = 100
+                for iter in range(warmup_iter+repeat_iter):
+                        if iter == warmup_iter:
+                                gpu_timer.start()
+                        spmm_util.gespmmCsrSpMM(M, K, A_csr.nnz, indptr_tensor, indices_tensor, data_tensor, B, N,C, True, alg)
+                gpu_timer.stop()
+                
+                kernel_dur_msecs = gpu_timer.elapsed_time()
+                MFlop_count = A_csr.nnz/1e6 * N * 2
+                gflops = MFlop_count/kernel_dur_msecs
+                sparsity = A_csr.nnz/M/K
+                
+                print(f"[GE-SpMM][Alg: {alg}] Report: spmm A({M} x {K}) * B({K} x {N}) sparsity {sparsity} (nnz={A_csr.nnz}) \n Time {kernel_dur_msecs} (ms), Throughput {gflops} (gflops).")
+                
+                        
+
         
 
 
