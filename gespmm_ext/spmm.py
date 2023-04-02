@@ -3,8 +3,8 @@ import numpy as np
 import torch
 import scipy
 import gespmm_ext as csrspmm
-import argparse
 from data_loader import DataLoader
+from spmm_util import SpmmUtil
 
 
 def main(argv):
@@ -36,20 +36,12 @@ def main(argv):
         indptr_tensor = torch.tensor(A_csr.indptr, dtype=torch.int32).cuda()
         indices_tensor = torch.tensor(A_csr.indices, dtype=torch.int32).cuda()
         data_tensor = torch.tensor(A_csr.data, dtype=torch.float32).cuda()
-
-        csrspmm.csrspmm_seqreduce_rowbalance(M, K, A_csr.nnz, indptr_tensor, indices_tensor, data_tensor, B, N, C)
-
-        if torch.all(torch.abs(C-C_ref) > 1e-2* torch.abs(C_ref)):
-                print("i am watching you mike wazowski")
-        else:
-                print("Fuck yeah")
         
-
-        print("C")
-        print(C)
-
-        print("C-ref")
-        print(C_ref)
+        spmm_util = SpmmUtil()
+        #csrspmm.csrspmm_seqreduce_rowbalance(M, K, A_csr.nnz, indptr_tensor, indices_tensor, data_tensor, B, N, C)
+        spmm_util.gespmmCsrSpMM(M, K, A_csr.nnz, indptr_tensor, indices_tensor, data_tensor, B, N,C, True)
+        spmm_util.check_result(C_ref, C)
+        
 
 
 
